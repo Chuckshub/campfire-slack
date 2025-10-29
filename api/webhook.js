@@ -44,14 +44,12 @@ export default async function handler(req, res) {
           {
             type: 'section',
             fields: [
-fields: [
-  { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number || 'N/A'}` },
-  { type: 'mrkdwn', text: `*Customer:*\n${invoice.client_name || invoice.customer_name || 'N/A'}` },
-  { type: 'mrkdwn', text: `*Amount:*\n$${parseFloat(invoice.total_amount || invoice.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-  { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
-  { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
-  { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
-]
+              { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Customer:*\n${invoice.client_name || invoice.customer_name || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Amount:*\n$${parseFloat(invoice.total_amount || invoice.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+              { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
+              { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
             ]
           },
           {
@@ -68,7 +66,4 @@ fields: [
     return res.status(200).json({ success: true, message: 'Notification sent' });
     
   } catch (error) {
-    console.error('Webhook error:', error);
-    return res.status(500).json({ success: false, error: error.message });
-  }
-}
+    console.error('Webhook error:',
