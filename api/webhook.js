@@ -1,0 +1,70 @@
+import crypto from 'crypto';
+
+export default async function handler(req, res) {
+  const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
+  const CAMPFIRE_WEBHOOK_SECRET = process.env.CAMPFIRE_WEBHOOK_SECRET;
+  
+  // Only accept POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  
+  try {
+    // Verify webhook signature (if secret is set)
+    if (CAMPFIRE_WEBHOOK_SECRET) {
+      const signature = req.headers['x-webhook-signature'] || req.headers['x-campfire-signature'];
+      if (signature) {
+        const hmac = crypto.createHmac('sha256', CAMPFIRE_WEBHOOK_SECRET);
+        hmac.update(JSON.stringify(req.body));
+        const expectedSignature = hmac.digest('hex');
+        
+        if (signature !== expectedSignature) {
+          console.log('Invalid signature');
+          return res.status(401).json({ error: 'Invalid signature' });
+        }
+      }
+    }
+    
+    console.log('Webhook received:', JSON.stringify(req.body));
+    
+    const data = req.body;
+    const invoice = data.data || data.invoice || data;
+    
+    // Send to Slack
+    await fetch(SLACK_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: `📝 New Invoice: ${invoice.invoice_number || invoice.number}`,
+        blocks: [
+          {
+            type: 'header',
+            text: { type: 'plain_text', text: '📝 New Invoice Created' }
+          },
+          {
+            type: 'section',
+            fields: [
+              { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number}` },
+              { type: 'mrkdwn', text: `*Customer:*\n${invoice.customer_name || invoice.customer?.name || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Amount:*\n$${parseFloat(invoice.amount || invoice.total || 0).toFixed(2)}` },
+              { type: 'mrkdwn', text: `*Status:*\n${invoice.status || 'N/A'}` }
+            ]
+          },
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: `<https://app.meetcampfire.com/invoices/${invoice.id}|View in Campfire →>`
+            }
+          }
+        ]
+      })
+    });
+    
+    return res.status(200).json({ success: true, message: 'Notification sent' });
+    
+  } catch (error) {
+    console.error('Webhook error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
