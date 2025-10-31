@@ -43,14 +43,16 @@ export default async function handler(req, res) {
           },
           {
             type: 'section',
-            fields: [
-              { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number || 'N/A'}` },
-              { type: 'mrkdwn', text: `*Customer:*\n${invoice.client_name || invoice.customer_name || 'N/A'}` },
-              { type: 'mrkdwn', text: `*Amount:*\n$${parseFloat(invoice.total_amount || invoice.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-              { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
-              { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
-              { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
-            ]
+          fields: [
+            { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number || 'N/A'}` },
+            { type: 'mrkdwn', text: `*Customer:*\n${invoice.client_name || invoice.customer_name || 'N/A'}` },
+            { type: 'mrkdwn', text: `*Amount:*\n${(() => {
+              const amount = parseFloat(invoice.amount_due || invoice.total_amount || invoice.amount || 0);
+              return amount > 0 ? `$${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';})()}` },
+            { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
+            { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
+            { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
+          ]
           },
           {
             type: 'section',
