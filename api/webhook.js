@@ -58,9 +58,14 @@ if (eventType === 'Invoice.paid') {
             { type: 'mrkdwn', text: `*Amount:*\n${(() => {
               const amount = parseFloat(invoice.amount_due || invoice.total_amount || invoice.amount || 0);
               return amount > 0 ? `$${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';})()}` },
-            { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
-            { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
-            { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
+            { type: 'mrkdwn', text: `*Amount:*\n${(() => {
+              if (eventType === 'Invoice.paid') {
+                const amountPaid = parseFloat(invoice.amount_paid || 0);
+                return amountPaid > 0 ? `$${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';
+              }
+              const amount = parseFloat(invoice.amount_due || invoice.total_amount || invoice.amount || 0);
+              return amount > 0 ? `$${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';
+            })()}` },
           ]
           },
           {
