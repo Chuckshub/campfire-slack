@@ -49,8 +49,7 @@ if (eventType === 'Invoice.paid') {
         blocks: [
           {
             type: 'header',
-            text: { type: 'plain_text', text: '📝 New Invoice Created' }
-          },
+            text: { type: 'plain_text', text: headerText }          },
           {
             type: 'section',
           fields: [
