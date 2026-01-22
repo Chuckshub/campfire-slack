@@ -27,15 +27,25 @@ export default async function handler(req, res) {
     
     console.log('Webhook received:', JSON.stringify(req.body));
     
-    const data = req.body;
-    const invoice = data.data || data.invoice || data;
+const data = req.body;
+const invoice = data.data || data.invoice || data;
+const eventType = data.topic || 'unknown';
+
+// Determine message based on event type
+let headerText = '📝 New Invoice Created';
+let emoji = '📝';
+
+if (eventType === 'Invoice.paid') {
+  headerText = '✅ Invoice Paid';
+  emoji = '✅';
+}
     
     // Send to Slack
     await fetch(SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        text: `📝 New Invoice: ${invoice.invoice_number || invoice.number}`,
+        text: `${emoji} Invoice: ${invoice.invoice_number || invoice.number}`,
         blocks: [
           {
             type: 'header',
