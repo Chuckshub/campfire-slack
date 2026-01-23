@@ -62,7 +62,6 @@ export default async function handler(req, res) {
               })()}` },
               { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
               { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
-              { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
             ]
           },
           {
