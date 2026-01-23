@@ -4,13 +4,11 @@ export default async function handler(req, res) {
   const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
   const CAMPFIRE_WEBHOOK_SECRET = process.env.CAMPFIRE_WEBHOOK_SECRET;
   
-  // Only accept POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   
   try {
-    // Verify webhook signature (if secret is set)
     if (CAMPFIRE_WEBHOOK_SECRET) {
       const signature = req.headers['x-webhook-signature'] || req.headers['x-campfire-signature'];
       if (signature) {
@@ -27,20 +25,18 @@ export default async function handler(req, res) {
     
     console.log('Webhook received:', JSON.stringify(req.body));
     
-const data = req.body;
-const invoice = data.data || data.invoice || data;
-const eventType = data.topic || 'unknown';
+    const data = req.body;
+    const invoice = data.data || data.invoice || data;
+    const eventType = data.topic || 'unknown';
 
-// Determine message based on event type
-let headerText = '📝 New Invoice Created';
-let emoji = '📝';
+    let headerText = '📝 New Invoice Created';
+    let emoji = '📝';
 
-if (eventType === 'Invoice.paid') {
-  headerText = '✅ Invoice Paid';
-  emoji = '✅';
-}
+    if (eventType === 'Invoice.paid') {
+      headerText = '✅ Invoice Paid';
+      emoji = '✅';
+    }
     
-    // Send to Slack
     await fetch(SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -49,24 +45,25 @@ if (eventType === 'Invoice.paid') {
         blocks: [
           {
             type: 'header',
-            text: { type: 'plain_text', text: headerText }          },
+            text: { type: 'plain_text', text: headerText }
+          },
           {
             type: 'section',
-      fields: [
-        { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number || 'N/A'}` },
-        { type: 'mrkdwn', text: `*Customer:*\n${invoice.client_name || invoice.customer_name || 'N/A'}` },
-        { type: 'mrkdwn', text: `*Amount:*\n${(() => {
-          if (eventType === 'Invoice.paid') {
-            const amountPaid = parseFloat(invoice.amount_paid || 0);
-            return amountPaid > 0 ? `$${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';
-          }
-          const amount = parseFloat(invoice.amount_due || invoice.total_amount || invoice.amount || 0);
-          return amount > 0 ? `$${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';
-        })()}` },
-        { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
-        { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
-        { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
-      ]
+            fields: [
+              { type: 'mrkdwn', text: `*Invoice #:*\n${invoice.invoice_number || invoice.number || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Customer:*\n${invoice.client_name || invoice.customer_name || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Amount:*\n${(() => {
+                if (eventType === 'Invoice.paid') {
+                  const amountPaid = parseFloat(invoice.amount_paid || 0);
+                  return amountPaid > 0 ? `$${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';
+                }
+                const amount = parseFloat(invoice.amount_due || invoice.total_amount || invoice.amount || 0);
+                return amount > 0 ? `$${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A';
+              })()}` },
+              { type: 'mrkdwn', text: `*Invoice Date:*\n${invoice.invoice_date || 'N/A'}` },
+              { type: 'mrkdwn', text: `*Payment Terms:*\n${invoice.payment_term_name || 'N/A'}` },
+              { type: 'mrkdwn', text: `*PO Number:*\n${invoice.purchase_order_number || 'N/A'}` }
+            ]
           },
           {
             type: 'section',
