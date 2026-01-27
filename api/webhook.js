@@ -68,7 +68,7 @@ export default async function handler(req, res) {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `<https://app.meetcampfire.com/v2/accounting/invoices/${invoice.id}|View in Campfire →>`
+              text: `<https://app.meetcampfire.com/v2/accounting/invoices/${invoice.id}|View in Campfire→>`
             }
           }
         ]
